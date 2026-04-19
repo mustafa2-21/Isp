@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نِت بروس | مزود الإنترنت الأول</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────────── */
+    :root {
+      --bg:         #050b18;
+      --surface:    #0a1628;
+      --card:       #0d1e35;
+      --accent:     #00d4ff;
+      --accent2:    #0066ff;
+      --accent3:    #7b2fff;
+      --gold:       #f5a623;
+      --text:       #e8f0fe;
+      --muted:      #6b82a8;
+      --border:     rgba(0,212,255,0.15);
+      --glow:       0 0 40px rgba(0,212,255,0.25);
+      --glow2:      0 0 60px rgba(0,102,255,0.3);
+      --radius:     16px;
+      --font-body:  'Cairo', sans-serif;
+      --font-head:  'Tajawal', sans-serif;
+    }
+
+    /* ─── Reset & Base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── Custom Cursor ──────────────────────────────────────── */
+    #cursor {
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transition: transform 0.1s ease;
+      mix-blend-mode: screen;
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(0,212,255,0.5);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transition: transform 0.18s ease, width 0.25s, height 0.25s, border-color 0.25s;
+    }
+    body:hover #cursor-ring { border-color: var(--accent); }
+
+    /* ─── Scrollbar ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 4px; }
+
+    /* ─── Noise Overlay ──────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ─── Grid Background ────────────────────────────────────── */
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ─── Floating Orbs ──────────────────────────────────────── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .orb-1 { width:500px;height:500px;background:rgba(0,102,255,0.12); top:-150px; right:-150px; animation-duration:20s; }
+    .orb-2 { width:400px;height:400px;background:rgba(123,47,255,0.1); bottom:0; left:-100px; animation-duration:25s; animation-delay:-8s; }
+    .orb-3 { width:300px;height:300px;background:rgba(0,212,255,0.08); top:40%; left:40%; animation-duration:15s; animation-delay:-4s; }
+
+    @keyframes drift {
+      0%   { transform: translate(0,0) scale(1); }
+      50%  { transform: translate(40px,-30px) scale(1.05); }
+      100% { transform: translate(-20px,50px) scale(0.95); }
+    }
+
+    /* ─── Sections Wrapper ───────────────────────────────────── */
+    section, header, footer { position: relative; z-index: 10; }
+
+    /* ═══════════════════════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════════════════════ */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 500;
+      padding: 18px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,11,24,0.75);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.4s;
+    }
+
+    .logo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.7rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      user-select: none;
+    }
+    .logo span { color: var(--gold); -webkit-text-fill-color: var(--gold); }
+
+    .nav-links {
+      display: flex; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.92rem; font-weight: 500;
+      transition: color 0.25s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; right: 0;
+      width: 0; height: 1.5px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      padding: 10px 28px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      border: none; border-radius: 100px;
+      color: #fff; font-family: var(--font-body);
+      font-weight: 600; font-size: 0.9rem;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px rgba(0,102,255,0.4);
+    }
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 30px rgba(0,102,255,0.6);
+    }
+
+    /* hamburger */
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:none; }
+    .hamburger span { width:26px;height:2px;background:var(--accent);border-radius:2px;transition:0.3s; }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 40px 80px;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin-bottom: 28px;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-badge .dot {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.5s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%,100%{ box-shadow: 0 0 0 0 rgba(0,212,255,0.6); }
+      50%     { box-shadow: 0 0 0 6px rgba(0,212,255,0); }
+    }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.8rem, 7vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      animation: fadeUp 0.9s 0.15s ease both;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      max-width: 600px; margin: 0 auto 40px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.7;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+
+    .hero-btns {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 1s 0.45s ease both;
+    }
+
+    .btn-primary {
+      padding: 16px 42px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none; border-radius: 100px;
+      color: #fff; font-family: var(--font-body);
+      font-size: 1rem; font-weight: 700;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 0 30px rgba(0,102,255,0.5);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 40px rgba(0,212,255,0.5);
+    }
+
+    .btn-ghost {
+      padding: 16px 42px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      color: var(--text); font-family: var(--font-body);
+      font-size: 1rem; font-weight: 600;
+      cursor: none;
+      transition: border-color 0.25s, color 0.25s, background 0.25s;
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,212,255,0.06);
+    }
+
+    /* Speed Counter */
+    .hero-stats {
+      display: flex; gap: 60px; justify-content: center;
+      margin-top: 80px;
+      animation: fadeUp 1s 0.6s ease both;
+    }
+    .stat-item { text-align: center; }
+    .stat-number {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+    /* Signal wave animation behind hero */
+    .wave-ring {
+      position: absolute;
+      border: 1px solid rgba(0,212,255,0.08);
+      border-radius: 50%;
+      animation: ripple 4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      0%  { transform: translate(-50%,-50%) scale(0.4); opacity: 1; }
+      100%{ transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+    }
+    .wave-ring:nth-child(1){ width:600px;height:600px;top:50%;left:50%;animation-delay:0s; }
+    .wave-ring:nth-child(2){ width:600px;height:600px;top:50%;left:50%;animation-delay:1.3s; }
+    .wave-ring:nth-child(3){ width:600px;height:600px;top:50%;left:50%;animation-delay:2.6s; }
+
+    /* ═══════════════════════════════════════════════════════════
+       MARQUEE TICKER
+    ═══════════════════════════════════════════════════════════ */
+    .ticker-wrap {
+      overflow: hidden;
+      background: linear-gradient(90deg, var(--accent2), var(--accent3), var(--accent2));
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .ticker-track {
+      display: flex; gap: 60px;
+      white-space: nowrap;
+      animation: marquee 30s linear infinite;
+    }
+    .ticker-item {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; font-weight: 600; letter-spacing: 0.5px;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SECTION SHARED
+    ═══════════════════════════════════════════════════════════ */
+    .section-wrap { padding: 110px 60px; max-width: 1200px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--accent);
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: '';
+      width: 24px; height: 1.5px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(28px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════
+       SERVICES
+    ═══════════════════════════════════════════════════════════ */
+    #services { background: var(--surface); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 36px;
+      transition: transform 0.3s ease, border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(0,212,255,0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .service-card:hover::before { opacity: 1; }
+    .service-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0,212,255,0.35);
+      box-shadow: var(--glow);
+    }
+
+    .service-icon {
+      width: 60px; height: 60px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+    }
+
+    .service-card h3 {
+      font-family: var(--font-head);
+      font-size: 1.25rem; font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .service-card p { color: var(--muted); line-height: 1.7; font-size: 0.95rem; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SPEED TEST WIDGET
+    ═══════════════════════════════════════════════════════════ */
+    #speedtest { padding: 110px 60px; }
+
+    .speedtest-wrap {
+      max-width: 860px; margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 60px;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .speedtest-wrap::before {
+      content: '';
+      position: absolute; top: -100px; left: 50%;
+      transform: translateX(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0,102,255,0.12), transparent 65%);
+    }
+
+    .gauge-wrap {
+      width: 220px; height: 220px;
+      margin: 40px auto;
+      position: relative;
+    }
+
+    .gauge-svg { width: 100%; height: 100%; }
+
+    .gauge-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
+    .gauge-fill  {
+      fill: none;
+      stroke: url(#gaugeGrad);
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-dasharray: 502;
+      stroke-dashoffset: 502;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gauge-value {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .gauge-number {
+      font-family: var(--font-head);
+      font-size: 3rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .gauge-unit { color: var(--muted); font-size: 0.85rem; margin-top: -4px; }
+
+    .speed-meters {
+      display: flex; gap: 40px; justify-content: center;
+      margin-top: 32px;
+    }
+    .speed-meter-item { text-align: center; }
+    .speed-meter-item .val {
+      font-family: var(--font-head);
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--accent);
+    }
+    .speed-meter-item .lab { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+
+    .btn-speed {
+      margin-top: 40px;
+      padding: 16px 52px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      border: none; border-radius: 100px;
+      color: #fff; font-family: var(--font-body);
+      font-size: 1rem; font-weight: 700;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 0 30px rgba(0,102,255,0.5);
+    }
+    .btn-speed:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(123,47,255,0.5);
+    }
+    .btn-speed:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .speed-status { color: var(--muted); font-size: 0.9rem; margin-top: 16px; min-height: 22px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       PLANS
+    ═══════════════════════════════════════════════════════════ */
+    #plans { background: var(--surface); }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+
+    .plan-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 44px 36px;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s;
+      overflow: hidden;
+    }
+    .plan-card.featured {
+      border-color: var(--accent2);
+      box-shadow: var(--glow2);
+      background: linear-gradient(160deg, rgba(0,102,255,0.12), var(--card) 60%);
+    }
+    .plan-card:hover { transform: translateY(-8px); }
+    .plan-card.featured:hover { box-shadow: 0 20px 60px rgba(0,102,255,0.4); }
+
+    .plan-badge {
+      position: absolute; top: 22px; left: 22px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff; font-size: 0.72rem; font-weight: 700;
+      padding: 4px 14px; border-radius: 100px;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-name {
+      font-family: var(--font-head);
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .plan-speed {
+      font-family: var(--font-head);
+      font-size: 3.2rem; font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .plan-speed span { font-size: 1.2rem; font-weight: 400; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+
+    .plan-price {
+      margin: 20px 0;
+      font-family: var(--font-head);
+    }
+    .plan-price .amount {
+      font-size: 2.6rem; font-weight: 800; color: var(--text);
+    }
+    .plan-price .period { color: var(--muted); font-size: 0.9rem; }
+
+    .plan-divider {
+      height: 1px; background: var(--border);
+      margin: 24px 0;
+    }
+
+    .plan-features { list-style: none; }
+    .plan-features li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    .plan-features li .chk {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(0,212,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+
+    .btn-plan {
+      display: block; width: 100%;
+      margin-top: 32px;
+      padding: 14px;
+      border-radius: 100px;
+      font-family: var(--font-body);
+      font-size: 0.96rem; font-weight: 700;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .btn-plan-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-plan-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,212,255,0.06);
+    }
+    .btn-plan-filled {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none;
+      color: #fff;
+      box-shadow: 0 0 24px rgba(0,102,255,0.4);
+    }
+    .btn-plan-filled:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,212,255,0.4);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       COVERAGE MAP
+    ═══════════════════════════════════════════════════════════ */
+    #coverage { padding: 110px 60px; }
+
+    .coverage-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: center;
+    }
+
+    .coverage-map {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      height: 380px;
+      overflow: hidden;
+    }
+    .map-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .map-dot {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+    }
+    .map-dot::after {
+      content: '';
+      position: absolute;
+      width: 30px; height: 30px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: ping 2s ease infinite;
+      opacity: 0;
+    }
+    @keyframes ping {
+      0%  { transform: translate(-50%,-50%) scale(0.5); opacity: 0.8; }
+      100%{ transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+    }
+    .map-dot:nth-child(2){ top:30%;left:25%;animation-delay:0.5s; }
+    .map-dot:nth-child(3){ top:55%;left:60%;animation-delay:1s; }
+    .map-dot:nth-child(4){ top:20%;left:70%;animation-delay:1.5s; }
+    .map-dot:nth-child(5){ top:70%;left:35%;animation-delay:0.8s; }
+    .map-dot:nth-child(6){ top:40%;left:80%;animation-delay:1.2s; }
+    .map-dot:nth-child(7){ top:80%;left:65%;animation-delay:0.3s; }
+
+    .map-pulse-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px dashed rgba(0,212,255,0.2);
+      animation: expand 5s linear infinite;
+    }
+    .map-pulse-circle:nth-child(8)  { width:160px;height:160px;top:30%;left:25%;transform:translate(-50%,-50%);animation-delay:0; }
+    .map-pulse-circle:nth-child(9)  { width:200px;height:200px;top:55%;left:60%;transform:translate(-50%,-50%);animation-delay:2s; }
+    @keyframes expand { from{opacity:0.4;transform:translate(-50%,-50%) scale(0.6);}to{opacity:0;transform:translate(-50%,-50%) scale(1.6);} }
+
+    .coverage-stat {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      transition: border-color 0.3s;
+    }
+    .coverage-stat:hover { border-color: rgba(0,212,255,0.35); }
+    .cov-icon {
+      width: 48px; height: 48px; flex-shrink: 0;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .cov-info { flex: 1; }
+    .cov-val {
+      font-family: var(--font-head);
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--accent);
+    }
+    .cov-desc { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       WHY US — Horizontal Scroll Cards
+    ═══════════════════════════════════════════════════════════ */
+    #why { background: var(--surface); padding: 110px 0; }
+    #why .section-wrap { padding-bottom: 0; }
+
+    .why-scroll {
+      display: flex; gap: 20px;
+      overflow-x: auto;
+      padding: 40px 60px 60px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .why-scroll::-webkit-scrollbar { height: 4px; }
+    .why-scroll::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 4px; }
+
+    .why-card {
+      flex: 0 0 280px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 30px;
+      scroll-snap-align: start;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .why-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0,212,255,0.3);
+    }
+    .why-icon { font-size: 2.4rem; margin-bottom: 20px; }
+    .why-card h3 {
+      font-family: var(--font-head);
+      font-size: 1.15rem; font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .why-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.65; }
+
+    /* ═══════════════════════════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════════════════════════ */
+    #testimonials { padding: 110px 60px; }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+
+    .testi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      position: relative;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .testi-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,212,255,0.3);
+    }
+    .testi-card::before {
+      content: '"';
+      position: absolute; top: 20px; right: 28px;
+      font-size: 5rem;
+      font-family: serif;
+      color: rgba(0,212,255,0.08);
+      line-height: 1;
+    }
+    .stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 16px; }
+    .testi-text {
+      color: var(--muted); font-size: 0.95rem;
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+    .testi-author {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .testi-avatar {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      flex-shrink: 0;
+    }
+    .testi-name { font-weight: 600; font-size: 0.95rem; }
+    .testi-loc { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SUPPORT / CONTACT
+    ═══════════════════════════════════════════════════════════ */
+    #contact { background: var(--surface); padding: 110px 60px; }
+
+    .contact-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: start;
+    }
+
+    .contact-channels { margin-top: 40px; display: flex; flex-direction: column; gap: 16px; }
+
+    .channel {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.3s, transform 0.25s;
+    }
+    .channel:hover {
+      border-color: rgba(0,212,255,0.4);
+      transform: translateX(-4px);
+    }
+    .ch-icon {
+      width: 46px; height: 46px; flex-shrink: 0;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .ch-title { font-weight: 600; font-size: 0.95rem; }
+    .ch-sub { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+
+    /* Form */
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+    .form-group label { font-size: 0.88rem; color: var(--muted); font-weight: 500; }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-group select { cursor: none; appearance: none; }
+    .form-group select option { background: var(--card); }
+
+    .btn-submit {
+      padding: 15px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none; border-radius: 100px;
+      color: #fff; font-family: var(--font-body);
+      font-size: 1rem; font-weight: 700;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 0 24px rgba(0,102,255,0.4);
+      margin-top: 8px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,212,255,0.4);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 40px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff; font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 100px;
+      z-index: 9999;
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════
+       FAQ
+    ═══════════════════════════════════════════════════════════ */
+    #faq { padding: 110px 60px; }
+    .faq-inner { max-width: 780px; margin: 0 auto; }
+
+    .faq-list { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; }
+
+    .faq-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .faq-item.open { border-color: rgba(0,212,255,0.35); }
+
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 28px;
+      cursor: none;
+      font-weight: 600; font-size: 1rem;
+      user-select: none;
+    }
+    .faq-arrow {
+      width: 28px; height: 28px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: var(--accent);
+      transition: transform 0.35s, border-color 0.3s;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); border-color: var(--accent); }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s ease, padding 0.3s;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      padding: 0 28px;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 28px 22px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       CTA BANNER
+    ═══════════════════════════════════════════════════════════ */
+    #cta { background: var(--surface); padding: 110px 60px; }
+
+    .cta-box {
+      max-width: 900px; margin: 0 auto;
+      background: linear-gradient(135deg, rgba(0,102,255,0.15), rgba(123,47,255,0.1));
+      border: 1px solid rgba(0,102,255,0.3);
+      border-radius: 28px;
+      padding: 80px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; inset: -1px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.3), rgba(123,47,255,0.2), transparent);
+      z-index: -1;
+    }
+
+    .cta-box h2 {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .cta-box p { color: var(--muted); font-size: 1.05rem; margin-bottom: 40px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════ */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 80px 60px 40px;
+    }
+    .footer-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand p {
+      color: var(--muted); font-size: 0.92rem;
+      line-height: 1.7; margin-top: 16px; max-width: 280px;
+    }
+    .social-links {
+      display: flex; gap: 12px; margin-top: 24px;
+    }
+    .social-btn {
+      width: 38px; height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.9rem;
+      transition: border-color 0.25s, color 0.25s, background 0.25s;
+    }
+    .social-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,212,255,0.08);
+    }
+
+    .footer-col h4 {
+      font-weight: 700; font-size: 0.95rem; margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul li a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.25s;
+    }
+    .footer-col ul li a:hover { color: var(--accent); }
+
+    .footer-bottom {
+      max-width: 1200px; margin: 0 auto;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    .footer-bottom a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-bottom a:hover { color: var(--accent); }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-cta { display: none; }
+
+      .section-wrap, #speedtest, #coverage, #contact, #faq, #testimonials, #cta { padding: 70px 24px; }
+      #why { padding: 70px 0; }
+      #why .section-wrap { padding: 0 24px 0; }
+      .why-scroll { padding: 30px 24px 40px; }
+
+      .hero { padding: 100px 24px 60px; }
+      .hero-stats { gap: 30px; }
+
+      .coverage-inner { grid-template-columns: 1fr; gap: 40px; }
+      .contact-inner  { grid-template-columns: 1fr; gap: 48px; }
+      .footer-grid    { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .footer-bottom  { flex-direction: column; gap: 12px; text-align: center; }
+
+      .speedtest-wrap { padding: 40px 24px; }
+      .cta-box { padding: 56px 28px; }
+    }
+
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .plans-grid  { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(5,11,24,0.98);
+      backdrop-filter: blur(20px);
+      z-index: 400;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text); text-decoration: none;
+      font-size: 1.5rem; font-weight: 600;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--accent); }
+    .mobile-close {
+      position: absolute; top: 24px; left: 24px;
+      background: none; border: none;
+      color: var(--muted); font-size: 1.8rem;
+      cursor: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Background -->
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Toast -->
+<div id="toast">✅ تم إرسال طلبك بنجاح! سنتواصل معك قريباً.</div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#services"     onclick="closeMobile()">الخدمات</a>
+  <a href="#speedtest"    onclick="closeMobile()">اختبار السرعة</a>
+  <a href="#plans"        onclick="closeMobile()">الباقات</a>
+  <a href="#coverage"     onclick="closeMobile()">التغطية</a>
+  <a href="#testimonials" onclick="closeMobile()">آراء العملاء</a>
+  <a href="#faq"          onclick="closeMobile()">الأسئلة الشائعة</a>
+  <a href="#contact"      onclick="closeMobile()">تواصل معنا</a>
+</div>
+
+<!-- ═══ NAVBAR ══════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="logo">نِت<span>بروس</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">الخدمات</a></li>
+    <li><a href="#speedtest">اختبار السرعة</a></li>
+    <li><a href="#plans">الباقات</a></li>
+    <li><a href="#coverage">التغطية</a></li>
+    <li><a href="#testimonials">العملاء</a></li>
+    <li><a href="#faq">الأسئلة</a></li>
+    <li><a href="#contact">تواصل معنا</a></li>
+  </ul>
+  <button class="nav-cta" onclick="scrollTo('#contact')">ابدأ الآن</button>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═════════════════════════════════════════════════ -->
+<header class="hero" id="home">
+  <div class="wave-ring"></div>
+  <div class="wave-ring"></div>
+  <div class="wave-ring"></div>
+
+  <div>
+    <div class="hero-badge">
+      <span class="dot"></span>
+      الشبكة الأسرع في المنطقة · متاح الآن
+    </div>
+
+    <h1>
+      إنترنت لا حدود له<br>
+      <span class="highlight">لعالم بلا توقف</span>
+    </h1>
+
+    <p class="hero-sub">
+      نوفّر لك اتصالاً فائق السرعة بتقنية الألياف الضوئية وشبكة 5G،
+      مع خدمة عملاء على مدار الساعة وأسعار تنافسية لا مثيل لها.
+    </p>
+
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="scrollTo('#plans')">اكتشف الباقات</button>
+      <button class="btn-ghost"   onclick="scrollTo('#speedtest')">اختبر سرعتك الآن</button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number" data-target="10">0</div>
+        <div class="stat-label">جيجابت / ثانية</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="99.9">0</div>
+        <div class="stat-label">٪ وقت التشغيل</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="500">0</div>
+        <div class="stat-label">ألف عميل</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="24">0</div>
+        <div class="stat-label">دعم على مدار الساعة</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ TICKER ═══════════════════════════════════════════════ -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- ═══ SERVICES ═════════════════════════════════════════════ -->
+<section id="services">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-label">خدماتنا</div>
+      <h2 class="section-title">كل ما تحتاجه في مكان واحد</h2>
+      <p class="section-sub">نقدّم حلولاً متكاملة للإنترنت المنزلي والتجاري والمؤسسي بأعلى معايير الجودة.</p>
+    </div>
+
+    <div class="services-grid">
+
+      <div class="service-card reveal">
+        <div class="service-icon" style="background:rgba(0,212,255,0.1);">🌐</div>
+        <h3>إنترنت منزلي فائق السرعة</h3>
+        <p>تجربة تصفح سلسة لجميع أفراد الأسرة بتقنية الألياف الضوئية FTTH مع سرعات تصل إلى 2 جيجابت.</p>
+      </div>
+
+      <div class="service-card reveal" style="transition-delay:0.1s">
+        <div class="service-icon" style="background:rgba(0,102,255,0.1);">🏢</div>
+        <h3>حلول الأعمال والمؤسسات</h3>
+        <p>اتصال مخصص بعرض نطاق ترددي ثابت وغير مشارك مع اتفاقيات مستوى الخدمة SLA مضمونة 100٪.</p>
+      </div>
+
+      <div class="service-card reveal" style="transition-delay:0.2s">
+        <div class="service-icon" style="background:rgba(123,47,255,0.1);">📡</div>
+        <h3>شبكة 5G اللاسلكية</h3>
+        <p>تغطية شاملة بتقنية الجيل الخامس لضمان اتصال فائق السرعة في كل مكان حتى في المناطق النائية.</p>
+      </div>
+
+      <div class="service-card reveal" style="transition-delay:0.3s">
+        <div class="service-icon" style="background:rgba(245,166,35,0.1);">🔒</div>
+        <h3>VPN وحماية البيانات</h3>
+        <p>خدمة VPN مدمجة مع جدار حماية ذكي يحمي خصوصيتك وبياناتك من الاختراق على مدار الساعة.</p>
+      </div>
+
+      <div class="service-card reveal" style="transition-delay:0.4s">
+        <div class="service-icon" style="background:rgba(0,212,255,0.1);">📺</div>
+        <h3>IPTV والبث المباشر</h3>
+        <p>أكثر من 500 قناة فضائية وخدمات البث العالمي Netflix وYouTube بجودة 4K بدون انقطاع.</p>
+      </div>
+
+      <div class="service-card reveal" style="transition-delay:0.5s">
+        <div class="service-icon" style="background:rgba(0,102,255,0.1);">☁️</div>
+        <h3>التخزين السحابي</h3>
+        <p>مساحة تخزين سحابية آمنة تصل إلى 5 تيرابايت لحفظ ملفاتك وصورك ومشاركتها بسهولة.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SPEED TEST ════════════════════════════════════════════ -->
+<section id="speedtest">
+  <div class="section-wrap" style="text-align:center;">
+    <div class="reveal">
+      <div class="section-label" style="justify-content:center;">اختبار السرعة</div>
+      <h2 class="section-title">اعرف سرعة إنترنتك الآن</h2>
+      <p class="section-sub" style="margin:0 auto;">اختبر سرعة التحميل والرفع ومعدل التأخير لاتصالك الحالي في ثوانٍ.</p>
+    </div>
+  </div>
+
+  <div style="padding:0 60px 110px; max-width:900px; margin:0 auto;" class="reveal">
+    <div class="speedtest-wrap">
+      <svg width="0" height="0">
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#0066ff"/>
+            <stop offset="100%" stop-color="#00d4ff"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <p style="color:var(--muted);font-size:0.9rem;">اضغط الزر لبدء الاختبار</p>
+
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 180 180">
+          <circle class="gauge-track" cx="90" cy="90" r="80" stroke-dasharray="502" stroke-dashoffset="125" transform="rotate(135 90 90)"/>
+          <circle class="gauge-fill"  cx="90" cy="90" r="80" id="gaugeFill" transform="rotate(135 90 90)"/>
+        </svg>
+        <div class="gauge-value">
+          <div class="gauge-number" id="gaugeNum">0</div>
+          <div class="gauge-unit">Mbps</div>
+        </div>
+      </div>
+
+      <div class="speed-meters">
+        <div class="speed-meter-item">
+          <div class="val" id="dlVal">—</div>
+          <div class="lab">⬇ تحميل</div>
+        </div>
+        <div class="speed-meter-item">
+          <div class="val" id="ulVal">—</div>
+          <div class="lab">⬆ رفع</div>
+        </div>
+        <div class="speed-meter-item">
+          <div class="val" id="pingVal">—</div>
+          <div class="lab">⚡ بينج (ms)</div>
+        </div>
+      </div>
+
+      <button class="btn-speed" id="startSpeed">ابدأ الاختبار</button>
+      <p class="speed-status" id="speedStatus"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PLANS ════════════════════════════════════════════════ -->
+<section id="plans">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-label">الباقات</div>
+      <h2 class="section-title">اختر الباقة المناسبة لك</h2>
+      <p class="section-sub">باقات مرنة تناسب جميع الاحتياجات بدون عقود طويلة الأمد.</p>
+    </div>
+
+    <div class="plans-grid">
+
+      <div class="plan-card reveal">
+        <div class="plan-name">الباقة الأساسية</div>
+        <div class="plan-speed">100 <span>Mbps</span></div>
+        <div class="plan-price">
+          <span class="amount">99</span>
+          <span class="period"> ر.س / شهر</span>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span> سرعة تحميل حتى 100 ميجابت</li>
+          <li><span class="chk">✓</span> بيانات غير محدودة</li>
+          <li><span class="chk">✓</span> دعم فني 24/7</li>
+          <li><span class="chk">✓</span> راوتر WiFi 6 مجاناً</li>
+          <li><span class="chk">✓</span> تركيب مجاني</li>
+        </ul>
+        <a href="#contact" class="btn-plan btn-plan-outline">اشترك الآن</a>
+      </div>
+
+      <div class="plan-card featured reveal" style="transition-delay:0.15s">
+        <div class="plan-badge">الأكثر طلباً</div>
+        <div class="plan-name">الباقة الاحترافية</div>
+        <div class="plan-speed">500 <span>Mbps</span></div>
+        <div class="plan-price">
+          <span class="amount">199</span>
+          <span class="period"> ر.س / شهر</span>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span> سرعة تحميل حتى 500 ميجابت</li>
+          <li><span class="chk">✓</span> بيانات غير محدودة</li>
+          <li><span class="chk">✓</span> دعم أولوي 24/7</li>
+          <li><span class="chk">✓</span> راوتر WiFi 6E مجاناً</li>
+          <li><span class="chk">✓</span> VPN مجاني لـ 5 أجهزة</li>
+          <li><span class="chk">✓</span> تخزين سحابي 1 TB</li>
+        </ul>
+        <a href="#contact" class="btn-plan btn-plan-filled">اشترك الآن</a>
+      </div>
+
+      <div class="plan-card reveal" style="transition-delay:0.3s">
+        <div class="plan-name">الباقة الألترا</div>
+        <div class="plan-speed">2 <span>Gbps</span></div>
+        <div class="plan-price">
+          <span class="amount">399</span>
+          <span class="period"> ر.س / شهر</span>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="chk">✓</span> سرعة تحميل حتى 2 جيجابت</li>
+          <li><span class="chk">✓</span> بيانات غير محدودة</li>
+          <li><span class="chk">✓</span> مدير حساب مخصص</li>
+          <li><span class="chk">✓</span> راوتر Mesh WiFi 7</li>
+          <li><span class="chk">✓</span> VPN لأجهزة غير محدودة</li>
+          <li><span class="chk">✓</span> تخزين سحابي 5 TB</li>
+          <li><span class="chk">✓</span> IP ثابت مجاناً</li>
+        </ul>
+        <a href="#contact" class="btn-plan btn-plan-outline">اشترك الآن</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COVERAGE ══════════════════════════════════════════════ -->
+<section id="coverage">
+  <div class="coverage-inner section-wrap" style="max-width:1200px;margin:0 auto;">
+
+    <div class="reveal">
+      <div class="section-label">التغطية</div>
+      <h2 class="section-title">نصل إليك أينما كنت</h2>
+      <p class="section-sub">شبكتنا تغطي أكثر من 150 مدينة ومحافظة بتقنيات متعددة لضمان أفضل تجربة.</p>
+
+      <div style="margin-top:40px;">
+        <div class="coverage-stat reveal">
+          <div class="cov-icon" style="background:rgba(0,212,255,0.1);">🏙️</div>
+          <div class="cov-info">
+            <div class="cov-val">150+</div>
+            <div class="cov-desc">مدينة ومنطقة مغطاة بالكامل</div>
+          </div>
+        </div>
+        <div class="coverage-stat reveal" style="transition-delay:0.1s">
+          <div class="cov-icon" style="background:rgba(0,102,255,0.1);">📶</div>
+          <div class="cov-info">
+            <div class="cov-val">99.8%</div>
+            <div class="cov-desc">نسبة تغطية الشبكة الوطنية</div>
+          </div>
+        </div>
+        <div class="coverage-stat reveal" style="transition-delay:0.2s">
+          <div class="cov-icon" style="background:rgba(123,47,255,0.1);">⚡</div>
+          <div class="cov-info">
+            <div class="cov-val">2ms</div>
+            <div class="cov-desc">أدنى معدل تأخير في الشبكة</div>
+          </div>
+        </div>
+        <div class="coverage-stat reveal" style="transition-delay:0.3s">
+          <div class="cov-icon" style="background:rgba(245,166,35,0.1);">🔧</div>
+          <div class="cov-info">
+            <div class="cov-val">&lt; 4h</div>
+            <div class="cov-desc">متوسط وقت إصلاح الأعطال</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="coverage-map reveal">
+      <div class="map-grid"></div>
+      <div class="map-dot" style="top:30%;left:25%;"></div>
+      <div class="map-dot" style="top:55%;left:60%;"></div>
+      <div class="map-dot" style="top:20%;left:70%;"></div>
+      <div class="map-dot" style="top:70%;left:35%;"></div>
+      <div class="map-dot" style="top:40%;left:80%;"></div>
+      <div class="map-dot" style="top:80%;left:65%;"></div>
+      <div class="map-dot" style="top:15%;left:45%;"></div>
+      <div class="map-pulse-circle"></div>
+      <div class="map-pulse-circle"></div>
+      <div style="position:absolute;bottom:20px;right:20px;background:rgba(0,212,255,0.1);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:0.8rem;color:var(--accent);">
+        📍 نقاط التغطية الحية
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ WHY US ════════════════════════════════════════════════ -->
+<section id="why">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-label">لماذا نِت بروس</div>
+      <h2 class="section-title">ما يميّزنا عن الجميع</h2>
+    </div>
+  </div>
+  <div class="why-scroll">
+    <div class="why-card">
+      <div class="why-icon">⚡</div>
+      <h3>سرعة لا تُنافَس</h3>
+      <p>شبكة ألياف ضوئية من الجيل التالي توفر سرعات تحميل ورفع متماثلة تصل إلى 10 جيجابت.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🛡️</div>
+      <h3>أمان على مستوى المؤسسات</h3>
+      <p>حماية متقدمة ضد الاختراق والبرمجيات الخبيثة مع مراقبة تلقائية للشبكة على مدار الساعة.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">📞</div>
+      <h3>دعم بشري حقيقي</h3>
+      <p>فريق دعم فني متخصص يرد على اتصالك خلال أقل من دقيقة واحدة في أي وقت من اليوم.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">💰</div>
+      <h3>بدون رسوم خفية</h3>
+      <p>أسعار شفافة 100٪ بدون عقود إلزامية أو رسوم تركيب أو مفاجآت في فاتورتك الشهرية.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🔄</div>
+      <h3>ضمان الجودة</h3>
+      <p>إذا لم تكن راضياً خلال أول 30 يوماً، نستردّ لك المبلغ كاملاً دون أي شروط أو قيود.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🌱</div>
+      <h3>مسؤولية بيئية</h3>
+      <p>بنية تحتية خضراء تعمل بالطاقة المتجددة للحد من بصمتنا الكربونية ودعم مستقبل أنظف.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">📱</div>
+      <h3>تطبيق ذكي</h3>
+      <p>تحكم كامل في شبكتك من تطبيق الهاتف: راقب الاستهلاك، أعد التشغيل، أضف أجهزة بلمسة واحدة.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🚀</div>
+      <h3>توصيل وتركيب سريع</h3>
+      <p>فريق تركيب متنقل يصلك خلال 24 ساعة من التسجيل بلا تأخير ولا معاناة.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ══════════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-label">آراء عملائنا</div>
+      <h2 class="section-title">ماذا يقول عملاؤنا؟</h2>
+      <p class="section-sub">أكثر من 500,000 عميل راضٍ يثقون في خدماتنا يومياً.</p>
+    </div>
+    <div class="testimonials-grid">
+
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">منذ انضممت لنِت بروس لم أعاني من أي انقطاع. السرعة مذهلة وفريق الدعم يحل أي مشكلة في دقائق. أنصح به بشدة لكل من يريد إنترنتاً حقيقياً.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">أ</div>
+          <div>
+            <div class="testi-name">أحمد الزهراني</div>
+            <div class="testi-loc">الرياض، السعودية</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal" style="transition-delay:0.1s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">كنت أعاني من بطء الإنترنت مع المزودين السابقين، لكن مع نِت بروس تغير كل شيء. الباقة الاحترافية تستحق كل ريال. الألعاب والبث بدون تقطع إطلاقاً.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">س</div>
+          <div>
+            <div class="testi-name">سارة المالكي</div>
+            <div class="testi-loc">جدة، السعودية</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal" style="transition-delay:0.2s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">نستخدم نِت بروس لشركتنا منذ سنتين. الاتصال المخصص لنا دائماً مستقر بنسبة 100٪ واتفاقية الخدمة محترمة تماماً. شريك تقني موثوق.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">م</div>
+          <div>
+            <div class="testi-name">محمد العتيبي</div>
+            <div class="testi-loc">الدمام، السعودية</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal" style="transition-delay:0.3s">
+        <div class="stars">★★★★☆</div>
+        <p class="testi-text">خدمة ممتازة والتركيب تم في نفس اليوم. التطبيق مريح جداً لمتابعة الاستهلاك وإدارة الشبكة. سعيد جداً بالقرار.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">ن</div>
+          <div>
+            <div class="testi-name">نورة القحطاني</div>
+            <div class="testi-loc">أبها، السعودية</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal" style="transition-delay:0.4s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">قدرت أشغّل اجتماعاتي عبر الفيديو وألعابي الأونلاين وأفراد عائلتي يبثّون فيديو 4K في نفس الوقت بدون أي مشكلة. هذا ما يسمى إنترنتاً حقيقياً!</p>
+        <div class="testi-author">
+          <div class="testi-avatar">خ</div>
+          <div>
+            <div class="testi-name">خالد الدوسري</div>
+            <div class="testi-loc">المدينة المنورة</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal" style="transition-delay:0.5s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">جربت ثلاثة مزودين قبل نِت بروس. الفرق شاسع جداً. السعر مناسب والجودة لا تُقارن. الدعم الفني سريع ومحترف. لن أغيّر مزودي أبداً.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">ع</div>
+          <div>
+            <div class="testi-name">عبدالله الشمري</div>
+            <div class="testi-loc">بريدة، السعودية</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="faq-inner section-wrap" style="max-width:780px;margin:0 auto;">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label" style="justify-content:center;">الأسئلة الشائعة</div>
+      <h2 class="section-title">لديك سؤال؟</h2>
+      <p class="section-sub" style="margin:0 auto;">إجابات واضحة لأكثر الأسئلة شيوعاً.</p>
+    </div>
+
+    <div class="faq-list reveal">
+
+      <div class="faq-item">
+        <div class="faq-q">كم يستغرق تركيب الخدمة بعد الاشتراك؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">نضمن لك تركيب الخدمة خلال 24 ساعة من تأكيد الاشتراك في المناطق المغطاة بالكامل. يصلك فريق التركيب المتخصص في الموعد المحدد دون أي تأخير.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">هل هناك عقود إلزامية أو رسوم خفية؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">لا على الإطلاق. جميع باقاتنا شهرية يمكن إلغاؤها في أي وقت بدون غرامات. الأسعار المعلنة تشمل كل شيء ولا توجد رسوم خفية أو مفاجآت في الفاتورة.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">ماذا يحدث إذا واجهت مشكلة في الاتصال؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">فريق الدعم الفني متاح 24/7 عبر الهاتف والدردشة المباشرة. في حالة الأعطال الميدانية نضمن وصول الفريق خلال 4 ساعات كحد أقصى وإصلاح المشكلة في نفس اليوم.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">هل يمكنني ترقية أو تخفيض باقتي؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">نعم يمكنك تغيير باقتك في أي وقت عبر تطبيقنا أو الاتصال بفريق الدعم. التغيير يسري فوراً عند الترقية وفي بداية الشهر التالي عند التخفيض.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">هل البيانات لها حد أقصى في الباقات؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">جميع باقاتنا تأتي ببيانات غير محدودة فعلياً. لا نطبّق سياسة الاستخدام العادل التي تُبطئ سرعتك بعد حد معين. السرعة ثابتة طوال الشهر.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">هل أحتاج لشراء راوتر منفصل؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">لا. جميع باقاتنا تشمل راوتر WiFi مجاناً (WiFi 6 للباقة الأساسية، WiFi 6E للاحترافية، وWiFi 7 Mesh للألترا). الجهاز ملك لك بدون أي رسوم إضافية.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">هل الخدمة متاحة خارج المدن الكبرى؟ <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">نغطي أكثر من 150 مدينة ومحافظة. للمناطق البعيدة نوفر حلول 5G اللاسلكية كبديل عالي الجودة. يمكنك التحقق من تغطية منطقتك عبر أداة التغطية على موقعنا.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ════════════════════════════════════════════════ -->
+<section id="contact">
+  <div class="contact-inner section-wrap" style="max-width:1100px;margin:0 auto;">
+
+    <div class="reveal">
+      <div class="section-label">تواصل معنا</div>
+      <h2 class="section-title">نحن هنا لمساعدتك</h2>
+      <p class="section-sub">فريقنا جاهز للإجابة على جميع استفساراتك وتقديم أفضل الحلول لاحتياجاتك.</p>
+
+      <div class="contact-channels">
+        <a href="tel:920000000" class="channel">
+          <div class="ch-icon" style="background:rgba(0,212,255,0.1);">📞</div>
+          <div>
+            <div class="ch-title">اتصل بنا مباشرة</div>
+            <div class="ch-sub">920-000-0000 · متاح 24/7</div>
+          </div>
+        </a>
+        <a href="https://wa.me/966500000000" class="channel">
+          <div class="ch-icon" style="background:rgba(37,211,102,0.1);">💬</div>
+          <div>
+            <div class="ch-title">واتساب</div>
+            <div class="ch-sub">رد فوري خلال دقائق</div>
+          </div>
+        </a>
+        <a href="mailto:support@netpro.sa" class="channel">
+          <div class="ch-icon" style="background:rgba(0,102,255,0.1);">✉️</div>
+          <div>
+            <div class="ch-title">البريد الإلكتروني</div>
+            <div class="ch-sub">support@netpro.sa</div>
+          </div>
+        </a>
+        <a href="#" class="channel">
+          <div class="ch-icon" style="background:rgba(123,47,255,0.1);">🗺️</div>
+          <div>
+            <div class="ch-title">مراكز الخدمة</div>
+            <div class="ch-sub">أكثر من 80 مركز في المملكة</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal" style="transition-delay:0.2s">
+      <h3 style="font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin-bottom:28px;">أرسل لنا رسالة</h3>
+      <div class="contact-form" id="contactForm">
+        <div class="form-group">
+          <label>الاسم الكامل</label>
+          <input type="text" id="fName" placeholder="أدخل اسمك الكامل" />
+        </div>
+        <div class="form-group">
+          <label>رقم الجوال</label>
+          <input type="tel" id="fPhone" placeholder="05xxxxxxxx" />
+        </div>
+        <div class="form-group">
+          <label>المدينة</label>
+          <select id="fCity">
+            <option value="">اختر مدينتك</option>
+            <option>الرياض</option>
+            <option>جدة</option>
+            <option>الدمام</option>
+            <option>المدينة المنورة</option>
+            <option>مكة المكرمة</option>
+            <option>أبها</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>الباقة المطلوبة</label>
+          <select id="fPlan">
+            <option value="">اختر الباقة</option>
+            <option>الباقة الأساسية - 99 ر.س</option>
+            <option>الباقة الاحترافية - 199 ر.س</option>
+            <option>الباقة الألترا - 399 ر.س</option>
+            <option>حلول الأعمال</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>رسالتك</label>
+          <textarea id="fMsg" placeholder="اكتب استفسارك أو ملاحظتك هنا..."></textarea>
+        </div>
+        <button class="btn-submit" id="submitBtn" onclick="submitForm()">إرسال الطلب ✈️</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ CTA BANNER ════════════════════════════════════════════ -->
+<section id="cta">
+  <div style="padding:110px 60px;">
+    <div class="cta-box reveal">
+      <h2>ابدأ رحلتك مع إنترنت لا حدود له</h2>
+      <p>انضم إلى أكثر من 500,000 عميل يستمتعون بأسرع وأموثق شبكة في المملكة. التركيب في 24 ساعة وضمان استرداد الأموال لمدة 30 يوماً.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="scrollTo('#contact')">اشترك الآن مجاناً</button>
+        <button class="btn-ghost" onclick="scrollTo('#plans')">قارن الباقات</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="font-size:1.9rem;">نِت<span>بروس</span></div>
+      <p>مزود الإنترنت الرائد في المملكة العربية السعودية. نربطك بالعالم بأسرع الشبكات وأكثرها موثوقية منذ عام 2010.</p>
+      <div class="social-links">
+        <a class="social-btn" href="#" title="تويتر">𝕏</a>
+        <a class="social-btn" href="#" title="انستغرام">📷</a>
+        <a class="social-btn" href="#" title="لينكدإن">in</a>
+        <a class="social-btn" href="#" title="يوتيوب">▶</a>
+        <a class="social-btn" href="#" title="سناب شات">👻</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>الخدمات</h4>
+      <ul>
+        <li><a href="#services">إنترنت منزلي</a></li>
+        <li><a href="#services">حلول الأعمال</a></li>
+        <li><a href="#services">شبكة 5G</a></li>
+        <li><a href="#services">VPN والحماية</a></li>
+        <li><a href="#services">IPTV</a></li>
+        <li><a href="#services">التخزين السحابي</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>الشركة</h4>
+      <ul>
+        <li><a href="#">من نحن</a></li>
+        <li><a href="#">أخبار الشركة</a></li>
+        <li><a href="#">وظائف</a></li>
+        <li><a href="#">شراكات</a></li>
+        <li><a href="#">المسؤولية الاجتماعية</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>الدعم</h4>
+      <ul>
+        <li><a href="#faq">الأسئلة الشائعة</a></li>
+        <li><a href="#contact">تواصل معنا</a></li>
+        <li><a href="#">حالة الشبكة</a></li>
+        <li><a href="#">مراكز الخدمة</a></li>
+        <li><a href="#">تحميل التطبيق</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2025 نِت بروس. جميع الحقوق محفوظة.</span>
+    <div style="display:flex;gap:24px;">
+      <a href="#">سياسة الخصوصية</a>
+      <a href="#">الشروط والأحكام</a>
+      <a href="#">سياسة الاستخدام</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════ -->
+<script>
+  /* ── Custom Cursor ─────────────────────────────────────── */
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cur.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a,button,[class*="card"],[class*="faq-q"],[class*="channel"]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width = '56px'; ring.style.height = '56px';
+      ring.style.borderColor = 'var(--accent)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px'; ring.style.height = '36px';
+      ring.style.borderColor = 'rgba(0,212,255,0.5)';
+    });
+  });
+
+  /* ── Navbar scroll ──────────────────────────────────────── */
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').style.background =
+      window.scrollY > 60 ? 'rgba(5,11,24,0.95)' : 'rgba(5,11,24,0.75)';
+  });
+
+  /* ── Mobile Menu ─────────────────────────────────────────── */
+  document.getElementById('hamburger').onclick = () =>
+    document.getElementById('mobileMenu').classList.add('open');
+  document.getElementById('mobileClose').onclick = () =>
+    document.getElementById('mobileMenu').classList.remove('open');
+
+  function closeMobile() {
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+
+  /* ── Scroll helper ───────────────────────────────────────── */
+  function scrollTo(sel) {
+    document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* ── Ticker ──────────────────────────────────────────────── */
+  const tickerItems = [
+    '⚡ سرعات تصل إلى 10 Gbps',
+    '📡 تغطية 5G في 150+ مدينة',
+    '🔒 حماية متقدمة مجانية',
+    '📺 IPTV أكثر من 500 قناة',
+    '☁️ تخزين سحابي حتى 5TB',
+    '🛠️ تركيب في 24 ساعة',
+    '💰 ضمان استرداد 30 يوم',
+    '📞 دعم 24/7 بدون انتظار',
+  ];
+  const track = document.getElementById('ticker');
+  const doubled = [...tickerItems, ...tickerItems];
+  track.innerHTML = doubled.map(t => `<span class="ticker-item">⬥ ${t}</span>`).join('');
+
+  /* ── Counter Animation ───────────────────────────────────── */
+  function animateCounter(el, target) {
+    const isFloat = String(target).includes('.');
+    const duration = 2200;
+    const startTime = performance.now();
+
+    function update(now) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const val = isFloat
+        ? (ease * target).toFixed(1)
+        : Math.floor(ease * target);
+      el.textContent = val;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const statsObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('[data-target]').forEach(el => {
+          animateCounter(el, parseFloat(el.dataset.target));
+        });
+        statsObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const heroStats = document.querySelector('.hero-stats');
+  if (heroStats) statsObserver.observe(heroStats);
+
+  /* ── Scroll Reveal ────────────────────────────────────────── */
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  /* ── Speed Test Simulation ───────────────────────────────── */
+  const startBtn  = document.getElementById('startSpeed');
+  const gaugeFill = document.getElementById('gaugeFill');
+  const gaugeNum  = document.getElementById('gaugeNum');
+  const dlVal     = document.getElementById('dlVal');
+  const ulVal     = document.getElementById('ulVal');
+  const pingVal   = document.getElementById('pingVal');
+  const status    = document.getElementById('speedStatus');
+  const FULL_DASH = 502;
+
+  function setGauge(pct) {
+    const filled = (FULL_DASH * 0.75) * Math.min(pct, 1);
+    gaugeFill.style.strokeDashoffset = FULL_DASH - filled;
+    gaugeFill.style.strokeDasharray  = FULL_DASH;
+  }
+
+  async function runSpeedTest() {
+    startBtn.disabled = true;
+    dlVal.textContent = ulVal.textContent = pingVal.textContent = '—';
+    setGauge(0); gaugeNum.textContent = '0';
+
+    status.textContent = '⚡ قياس زمن الاستجابة...';
+    await new Promise(r => setTimeout(r, 800));
+    const ping = Math.floor(Math.random() * 8 + 3);
+    pingVal.textContent = ping + ' ms';
+
+    status.textContent = '⬇ قياس سرعة التحميل...';
+    const dlSpeed = Math.random() * 400 + 100;
+    let elapsed = 0;
+    await new Promise(res => {
+      const iv = setInterval(() => {
+        elapsed += 80;
+        const pct = Math.min(elapsed / 4000, 1);
+        const cur = dlSpeed * pct;
+        gaugeNum.textContent = cur.toFixed(0);
+        setGauge(cur / 1000);
+        if (pct >= 1) { clearInterval(iv); res(); }
+      }, 80);
+    });
+    dlVal.textContent = dlSpeed.toFixed(1) + ' Mbps';
+
+    status.textContent = '⬆ قياس سرعة الرفع...';
+    const ulSpeed = dlSpeed * (Math.random() * 0.3 + 0.6);
+    let elapsed2 = 0;
+    await new Promise(res => {
+      const iv = setInterval(() => {
+        elapsed2 += 80;
+        const pct = Math.min(elapsed2 / 3000, 1);
+        const cur = ulSpeed * pct;
+        gaugeNum.textContent = cur.toFixed(0);
+        setGauge(cur / 1000);
+        if (pct >= 1) { clearInterval(iv); res(); }
+      }, 80);
+    });
+    ulVal.textContent = ulSpeed.toFixed(1) + ' Mbps';
+    gaugeNum.textContent = dlSpeed.toFixed(0);
+    setGauge(dlSpeed / 1000);
+
+    status.textContent = '✅ اكتمل الاختبار بنجاح!';
+    startBtn.disabled = false;
+    startBtn.textContent = 'أعد الاختبار';
+  }
+
+  startBtn.addEventListener('click', runSpeedTest);
+
+  /* ── FAQ Accordion ───────────────────────────────────────── */
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── Contact Form ────────────────────────────────────────── */
+  function submitForm() {
+    const name  = document.getElementById('fName').value.trim();
+    const phone = document.getElementById('fPhone').value.trim();
+    const city  = document.getElementById('fCity').value;
+    const plan  = document.getElementById('fPlan').value;
+    const toast = document.getElementById('toast');
+
+    if (!name || !phone || !city || !plan) {
+      toast.textContent = '⚠️ يرجى ملء جميع الحقول المطلوبة';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+      return;
+    }
+
+    toast.textContent = '✅ تم إرسال طلبك بنجاح! سنتواصل معك خلال 24 ساعة.';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+
+    ['fName','fPhone','fCity','fPlan','fMsg'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  /* ── Gauge init ──────────────────────────────────────────── */
+  setGauge(0);
+</script>
+</body>
+</html>
